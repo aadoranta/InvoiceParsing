@@ -1,0 +1,4 @@
+env
+event_log.txt
+__pycache__/
+images/

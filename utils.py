@@ -1,16 +1,22 @@
 import os
 import re
-import io
 import pytesseract
 
 from PIL import Image
+from io import BytesIO
 
-def extract_invoice_no(string):
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+
+def extract_invoice_no(image):
+
+    image_pil = Image.open(BytesIO(image))
+    text = pytesseract.image_to_string(image_pil, config='--psm 6')
+
     pattern1 = r'(?i)no\.\s*(\d+)'
-    match1 = re.search(pattern1, string)
+    match1 = re.search(pattern1, text)
 
     pattern2 = r'(?i)no\.:\s*(\d+)'
-    match2 = re.search(pattern2, string)
+    match2 = re.search(pattern2, text)
     
     if match1:
         match1 = match1.group(1)

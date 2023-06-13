@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flask App</title>
+    <title>Invoice Parsing</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Welcome to my Flask App!</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/jpeg">
-        <input type="submit" value="Upload">
+    <h1>Invoice Management</h1>
+    <form action="/new_upload" method="post">
+        <input type="submit" name="newUpload" value="Upload New Invoice">
+    </form>
+    <form action="/retrieve" method="post">
+        <input type="submit" name="retrieve" value="Retrieve Invoice">
     </form>
 </body>
 </html>

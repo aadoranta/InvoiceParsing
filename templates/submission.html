@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice Parsing</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h1>Upload your Invoice</h1>
+    <form action="/select" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/jpeg">
+        <input type="text" name="invoiceNum" value="{{ invoice_no }}">
+        <input type="submit" value="Select File">
+    </form>
+</body>

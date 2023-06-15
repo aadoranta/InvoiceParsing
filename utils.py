@@ -32,6 +32,20 @@ def extract_invoice_no(image):
     
     return result
 
+def delete_images(filenames, type="upload"):
+    
+    for filename in filenames:
+        if type == "upload":
+            try:
+                os.remove('static/images_upload/' + filename)
+            except FileNotFoundError:
+                pass
+        else:
+            try:
+                os.remove('static/images_download/' + filename)
+            except FileNotFoundError:
+                pass
+
 
 def save_image(image, filename, type="upload"):
 
@@ -52,6 +66,14 @@ def get_label_dict(file_path):
             invoice_dict[key.strip()] = int(value.strip())
 
     return invoice_dict
+
+def update_session_files(session_list, new_file):
+
+    if session_list:
+        session_list.append(new_file)
+    else: 
+        session_list = [new_file]
+        
 
 def rename_files(directory):
     file_counter = 1

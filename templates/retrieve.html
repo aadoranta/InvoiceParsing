@@ -1,16 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice Parsing</title>
+    <title>Invoice Management</title>
+    <form action="/home" method="post" id="homeButton">
+        <input type="submit" value="Go To Home Page">
+    </form>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <form id="retrieveInvoice" action="/retrieve" method="post">
-        <input type="text" name="invoiceNo" id="invoiceNo" value="{{ invoice_no }}" pattern="[0-9]+">
+        <input type="text" name="invoiceNo" id="retrieveInvoiceNo" value="{{ invoice_no }}" pattern="[0-9]+" placeholder="Enter Invoice Number">
         <input type="submit" value="Retrieve Invoice From Database">
     </form>
     {% if has_image %}
-        <img src="{{ url_for('static', filename='images_download/' + image_filename) }}" alt="Uploaded Image">
+        <div style="position: relative;">
+            <a href="{{ url_for('static', filename='images_download/' + image_filename) }}" download style="position: absolute; top: 0;">
+                <button>Download Invoice Image</button>
+            </a>
+            <img src="{{ url_for('static', filename='images_download/' + image_filename) }}" id="retrievedImage" alt="Uploaded Image" style="display: block; margin-top: 30px;">
+        </div>
+    {% endif %}
+
+    {% if invoice_not_exists %}
+        <h3>The invoice you requested does not exist. Please select another invoice number.</h3>
     {% endif %}
 </body>

@@ -2,6 +2,7 @@ import psycopg2
 
 from io import BytesIO
 from utils import *
+from datetime import datetime
 from flask import Flask, render_template, request, session
 
 app = Flask(__name__)
@@ -35,13 +36,20 @@ def after_request(response):
 def index():
     return render_template('index.html')
 
+@app.route('/home', methods=['POST'])
+def home():
+    try:
+        delete_images(session["image_filenames"], type="download")
+    except KeyError:
+        pass
+    return render_template('index.html')
+
 @app.route('/new_upload', methods=['POST'])
 def new_upload():
-    return render_template('submission.html')
+    return render_template('submission.html',
+                           invoice_exists=False)
 
 @app.route('/select', methods=['POST'])
-# Must verify that the invoice number is unique
-# What to title the file after it has been saved
 def select():
     if 'image' in request.files:
 
@@ -49,7 +57,13 @@ def select():
         image = request.files['image']
         image_filename = image.filename
         image = image.read()
+
+        # Keep track of most recent image and all viewed images
         session['image_filename'] = image_filename
+        try:
+            session['image_filenames'].append(image_filename)
+        except KeyError:
+            session['image_filenames'] = list()
 
         # Get the invoice number
         invoice_no = extract_invoice_no(image)
@@ -68,6 +82,7 @@ def select():
     return render_template("submission.html", 
                             invoice_no=invoice_no, 
                             has_image=has_image,
+                            invoice_exists=False,
                             image_filename=image_filename
                             )
 
@@ -76,7 +91,7 @@ def upload():
     # Handle Primary key duplications
     # Delete images stored locally
     image_filename = session.get('image_filename')
-    image_filepath = os.path.join(os.getcwd(), "static", "images", image_filename)
+    image_filepath = os.path.join(os.getcwd(), "static", "images_upload", image_filename)
     if image_filename:
 
         with open(image_filepath, 'rb') as image:
@@ -89,8 +104,14 @@ def upload():
 
         # Execute the INSERT query with the provided ID
         query = "INSERT INTO \"invoiceImages\" (\"invoiceNo\", \"imageData\") VALUES (%s, %s);"
-        cursor.execute(query, (int(image_id), psycopg2.Binary(image)))
-
+        try:
+            cursor.execute(query, (int(image_id), psycopg2.Binary(image)))
+        except psycopg2.errors.UniqueViolation:
+            delete_images(session['image_filenames'])
+            return render_template('submission.html', invoice_exists=True)
+        
+        # Eliminate all residual images
+        delete_images(session['image_filenames'])
         return render_template('index.html')
     else:
         return 'No image file provided.'
@@ -101,29 +122,49 @@ def new_retrieve():
 
 @app.route('/retrieve', methods=["POST"])
 def retrieve():
-    print("HELLO")
-    # Think about sessions here. Probably can't name every file "temp.jpg"
+
+    # Delete any pre-existing downloaded files
+    try:
+        delete_images(session["image_filenames"], type="download")
+    except KeyError:
+        pass
+
+    
     image_id = request.form.get("invoiceNo")
-
     cursor = conn.cursor()
-
     query = "SELECT \"imageData\" FROM \"invoiceImages\" WHERE \"invoiceNo\" = (%s);"
-    cursor.execute(query, (int(image_id),))
+    
+    # Try to retrieve the image
+    try:
+        cursor.execute(query, (image_id,))
+    except psycopg2.errors.InvalidTextRepresentation:
+        return render_template("retrieve.html", 
+                        invoice_not_exists=True
+                        )
 
+    # Ensure retrieved image exists
     image_data = cursor.fetchall()
-    image_data = image_data[0][0]
-
+    try:
+        image_data = image_data[0][0]
+    except IndexError:
+        return render_template("retrieve.html", 
+                               invoice_not_exists=True
+                               )
+    
+    # Display image if exists
     if image_data:
-
         has_image=True
-        save_image(image_data, "temp.jpg", type="download")
+        image_filename = str(datetime.now().strftime("%Y%m%d_%H%M%S")) + ".jpg"
+        session['image_filename'] = image_filename
+        try:
+            session['image_filenames'].append(image_filename)
+        except KeyError:
+            session['image_filenames'] = list()
+        save_image(image_data, image_filename, type="download")
     else:
-
         has_image=False
 
     return render_template('retrieve.html', 
-                           image_filename="temp.jpg",
+                           image_filename=image_filename,
+                           invoice_not_exists=False,
                            has_image=has_image)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)

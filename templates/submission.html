@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice Parsing</title>
+    <title>Invoice Management</title>
+    <form action="/home" method="post" id="homeButton">
+        <input type="submit" value="Go To Home Page">
+    </form>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -15,16 +18,17 @@
     </form>
 
     {% if has_image %}
+        <form id="uploadToDatabase" action="/upload" method="post">
+            <label for="invoiceNo" id="invoiceNoLabel">Automatically Generated Invoice Number (Ensure it is correct)</label>
+            <input type="text" name="invoiceNo" id="submitInvoiceNo" value="{{ invoice_no }}">
+            <input type="submit" value="Upload Invoice to Database">
+        </form>
         <h3>Image Preview:</h3>
         <img src="{{ url_for('static', filename='images_upload/' + image_filename) }}" alt="Uploaded Image">
+    {% endif %}
 
-        <form id="uploadToDatabase" action="/upload" method="post">
-            <label for="invoiceNo" id="invoiceNoLabel">Automatically Generated Invoice Number</label>
-            <input type="text" name="invoiceNo" id="invoiceNo" value="{{ invoice_no }}">
-            <label for="imageUpload">Ensure Correct Invoice Number
-                <input type="submit" value="Upload Invoice to Database">
-            </label>
-        </form>
+    {% if invoice_exists %}
+        <h3>The invoice you tried to upload already exists in the database. Please upload another invoice.</h3>
     {% endif %}
 
 </body>

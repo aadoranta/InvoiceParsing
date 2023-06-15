@@ -8,17 +8,16 @@ img {
     height: 900px;
 }
 
-#invoiceNo {
-    position: absolute;
-    top: 100px;
-    left: 750px;
-  }
+#retrieveInvoice {
+    padding: 10px 0px;
+}
 
-#invoiceNoLabel {
-    position: absolute;
-    top: 100px;
-    left: 750px;
-    }   
+#homeButton {
+    padding: 10px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+}
 
 .file-upload-button {
     display: inline-block;
@@ -32,3 +31,10 @@ img {
 .file-upload-button:hover {
     background-color: #45a049;
     }
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}

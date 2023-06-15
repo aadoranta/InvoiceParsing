@@ -7,9 +7,24 @@
 
 <body>
     <h1>Upload your Invoice</h1>
-    <form action="/select" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/jpeg">
-        <input type="text" name="invoiceNum" value="{{ invoice_no }}">
-        <input type="submit" value="Select File">
+    <form id="uploadForm" action="/select" method="post" enctype="multipart/form-data">
+        <label for="imageInput" class="file-upload-label">
+            <span class="file-upload-button">Select File</span>
+            <input type="file" id="imageInput" name="image" accept="image/jpeg" style="display: none;" onchange="document.getElementById('uploadForm').submit();">
+        </label>
     </form>
+
+    {% if has_image %}
+        <h3>Image Preview:</h3>
+        <img src="{{ url_for('static', filename='images_upload/' + image_filename) }}" alt="Uploaded Image">
+
+        <form id="uploadToDatabase" action="/upload" method="post">
+            <label for="invoiceNo" id="invoiceNoLabel">Automatically Generated Invoice Number</label>
+            <input type="text" name="invoiceNo" id="invoiceNo" value="{{ invoice_no }}">
+            <label for="imageUpload">Ensure Correct Invoice Number
+                <input type="submit" value="Upload Invoice to Database">
+            </label>
+        </form>
+    {% endif %}
+
 </body>

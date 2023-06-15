@@ -2,3 +2,33 @@ h1 {
     color: blue;
     text-align: center;
 }
+
+img {
+    width: 700px;
+    height: 900px;
+}
+
+#invoiceNo {
+    position: absolute;
+    top: 100px;
+    left: 750px;
+  }
+
+#invoiceNoLabel {
+    position: absolute;
+    top: 100px;
+    left: 750px;
+    }   
+
+.file-upload-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    }
+
+.file-upload-button:hover {
+    background-color: #45a049;
+    }

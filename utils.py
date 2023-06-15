@@ -32,6 +32,15 @@ def extract_invoice_no(image):
     
     return result
 
+
+def save_image(image, filename, type="upload"):
+
+    image_pil = Image.open(BytesIO(image))
+    if type == "upload":
+        image_pil.save('static/images_upload/' + filename)
+    else:
+        image_pil.save('static/images_download/' + filename)
+
 def get_label_dict(file_path):
 
     invoice_dict = dict()

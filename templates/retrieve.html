@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice Parsing</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <form id="retrieveInvoice" action="/retrieve" method="post">
+        <input type="text" name="invoiceNo" id="invoiceNo" value="{{ invoice_no }}" pattern="[0-9]+">
+        <input type="submit" value="Retrieve Invoice From Database">
+    </form>
+    {% if has_image %}
+        <img src="{{ url_for('static', filename='images_download/' + image_filename) }}" alt="Uploaded Image">
+    {% endif %}
+</body>

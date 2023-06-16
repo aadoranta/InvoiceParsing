@@ -3,14 +3,64 @@
 <head>
     <title>Invoice Parsing</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Link to TableSorter via CDN -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    
+    <!-- Custom script for table sorting -->
+    <script>
+        $(document).ready(function() {
+        $("#invoiceTable").tablesorter();
+        });
+    </script>
 </head>
 <body>
-    <h1>Invoice Management</h1>
-    <form action="/new_upload" method="post">
-        <input type="submit" name="newUpload" value="Upload New Invoice">
-    </form>
-    <form action="/new_retrieve" method="post">
-        <input type="submit" name="retrieve" value="Retrieve Invoice">
-    </form>
+    <div>
+        <h1>Invoice Management</h1>
+        <form action="/new_upload" method="post">
+            <input type="submit" name="newUpload" value="Upload New Invoice">
+        </form>
+        <form action="/new_retrieve" method="post">
+            <input type="submit" name="retrieve" value="Retrieve Invoice">
+        </form>
+    </div>
+
+    <div>
+        <h3>Uploaded Invoices</h3>
+        <form action="/date_query" method="GET">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+            
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" required>
+    
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+
+    <div class="date-query-container">
+
+        </script>
+        <table id="invoiceTable">
+        <thead>
+            <tr>
+                <th>Invoice Number</th>
+                <th>Upload Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.invoice_number }}</td>
+                <td>{{ row.upload_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    
 </body>
 </html>

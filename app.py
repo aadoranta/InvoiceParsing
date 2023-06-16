@@ -34,7 +34,7 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', data=list())
 
 @app.route('/home', methods=['POST'])
 def home():
@@ -43,6 +43,24 @@ def home():
     except KeyError:
         pass
     return render_template('index.html')
+
+@app.route('/date_query', methods=['GET', 'POST'])
+def date_query():
+
+    # Get user-selected date range
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    # Get results from query
+    cursor = conn.cursor()
+    query = "SELECT \"invoiceNo\", \"uploadDate\" FROM \"invoiceImages\" WHERE \"uploadDate\" BETWEEN (%s) AND (%s);"
+    cursor.execute(query, (start_date, end_date))
+
+    raw_data = cursor.fetchall()
+    
+    data = process_data(raw_data)
+
+    return render_template("index.html", data=data)
 
 @app.route('/new_upload', methods=['POST'])
 def new_upload():
@@ -73,9 +91,7 @@ def select():
 
         # Set a flag indicating that an image is available
         has_image = True
-
     else:
-
         has_image = False
         image_filename = ''
 
@@ -102,10 +118,13 @@ def upload():
         # Get the ID value from the request
         image_id = request.form.get('invoiceNo')
 
+        # Get Current Date
+        current_date = str(datetime.now().strftime("%Y-%m-%d"))
+
         # Execute the INSERT query with the provided ID
-        query = "INSERT INTO \"invoiceImages\" (\"invoiceNo\", \"imageData\") VALUES (%s, %s);"
+        query = "INSERT INTO \"invoiceImages\" (\"invoiceNo\", \"imageData\", \"uploadDate\") VALUES (%s, %s, %s);"
         try:
-            cursor.execute(query, (int(image_id), psycopg2.Binary(image)))
+            cursor.execute(query, (int(image_id), psycopg2.Binary(image), current_date))
         except psycopg2.errors.UniqueViolation:
             delete_images(session['image_filenames'])
             return render_template('submission.html', invoice_exists=True)
@@ -168,3 +187,6 @@ def retrieve():
                            image_filename=image_filename,
                            invoice_not_exists=False,
                            has_image=has_image)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True)

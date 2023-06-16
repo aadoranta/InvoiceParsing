@@ -1,6 +1,7 @@
 import os
 import re
 import pytesseract
+import datetime
 
 from PIL import Image
 from io import BytesIO
@@ -67,12 +68,15 @@ def get_label_dict(file_path):
 
     return invoice_dict
 
-def update_session_files(session_list, new_file):
+def process_data(raw_data):
 
-    if session_list:
-        session_list.append(new_file)
-    else: 
-        session_list = [new_file]
+    data = list()
+    for datum in raw_data:
+        invoice_no = datum[0]
+        date = datum[1].strftime("%Y-%m-%d")
+        data.append({'invoice_number': invoice_no, 'upload_date': date})
+    
+    return data
         
 
 def rename_files(directory):
